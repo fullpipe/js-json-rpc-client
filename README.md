@@ -5,7 +5,7 @@ Json rpc client
 
 ## Installation 
 ```sh
-npm install fullpipe/js-json-rpc-client --save
+npm install js-json-rpc-client --save
 ```
 
 ## Usage
