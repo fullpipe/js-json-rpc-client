@@ -16,7 +16,6 @@ npm install fullpipe/js-json-rpc-client --save
 import { Injectable } from "@angular/core";
 import { RpcClient } from "js-json-rpc-client";
 import { FetchTransport } from "js-json-rpc-client";
-import { TokenHolderService } from "./token-holder.service";
 
 @Injectable({
   providedIn: "root"
@@ -25,11 +24,7 @@ export class RpcService {
   private token: string;
   private client: RpcClient;
 
-  constructor(tokenHolder: TokenHolderService) {
-    tokenHolder.token$.subscribe(token => {
-      this.token = token;
-    });
-
+  constructor() {
     this.client = new RpcClient(
       new FetchTransport({
         url: "http://127.0.0.1:8000/api",
