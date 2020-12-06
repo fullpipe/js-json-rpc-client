@@ -1,6 +1,6 @@
-import { Request } from "../request";
-import { Response } from "../response";
+import { Request } from '../request';
+import { Response } from '../response';
 
 export interface TransportInterface {
-  execute(request: Request): Promise<Response>;
+    execute(request: Request): Promise<Response>;
 }

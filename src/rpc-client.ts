@@ -10,8 +10,9 @@ export class RpcClient {
   async call(method: string, params?: { [key: string]: any }) {
     const request = new Request("1", method, params);
 
-    this.beforeStack.forEach(fn => fn(request));
+    this.beforeStack.forEach((fn) => fn(request));
 
+    // TODO: catch all errors and wrap in ResponseError
     const response = await this.transport.execute(request);
     if (response.error) {
       throw new ResponseError(response.error);
