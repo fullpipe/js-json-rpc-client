@@ -2,11 +2,11 @@ import { TransportInterface } from './transport.interface';
 import { Request } from '../request';
 import { Response as JsonResponse } from '../response';
 import { genericRetryStrategy } from './generic-retry-strategy';
-import { fromFetch } from 'rxjs/fetch';
-import { of, throwError } from 'rxjs';
-import { mergeMap, switchMap, retryWhen } from 'rxjs/operators';
+import { from, of, throwError } from 'rxjs';
+import { switchMap, retryWhen, catchError } from 'rxjs/operators';
 import { RequestBody } from './request-body';
 import { RetryConfig } from './generic-retry-strategy';
+import fetch from 'isomorphic-unfetch';
 
 interface FetchTransportConfig {
     url: string;
@@ -26,18 +26,20 @@ export class FetchTransport implements TransportInterface {
             body.id = request.id;
         }
 
-        if (request.params) {
+        if (request.hasOwnProperty('params')) {
             body.params = request.params;
         }
 
         request.headers['Content-Type'] = 'application/json';
 
-        return fromFetch(this.config.url, {
-            method: 'POST',
-            headers: request.headers,
-            body: JSON.stringify(body),
-            credentials: 'omit',
-        })
+        return from(
+            fetch(this.config.url, {
+                method: 'POST',
+                headers: request.headers,
+                body: JSON.stringify(body),
+                credentials: 'omit',
+            }),
+        )
             .pipe(
                 switchMap((response) => {
                     if (!response.ok) {
@@ -46,23 +48,31 @@ export class FetchTransport implements TransportInterface {
 
                     return response.json();
                 }),
-                mergeMap((json: JsonResponse) => {
+                retryWhen(genericRetryStrategy(this.config.retryConfig)),
+                catchError((e) => of(errorResponse(request.id, -32768, e))),
+                switchMap((json: JsonResponse) => {
                     if (!json) {
-                        return throwError(`No results from server`);
+                        return of(errorResponse(request.id, -32768, 'No results from server'));
                     }
 
                     if (!json.hasOwnProperty('error') && !json.hasOwnProperty('result')) {
-                        return throwError(`Empty result from server`);
-                    }
-
-                    if (json.error && json.error['code'] === -32603) {
-                        return throwError(json.error['message']);
+                        return of(errorResponse(request.id, -32768, 'No results from server'));
                     }
 
                     return of(json);
                 }),
-                retryWhen(genericRetryStrategy(this.config.retryConfig)),
             )
             .toPromise();
     }
+}
+
+function errorResponse(id: string | number | null, code: number, message: string): JsonResponse {
+    return {
+        id: id,
+        jsonrpc: '2.0',
+        error: {
+            code: code,
+            message: message,
+        },
+    };
 }

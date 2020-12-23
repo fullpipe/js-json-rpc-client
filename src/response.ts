@@ -1,5 +1,5 @@
 export interface Response {
-    id: string;
+    id: string | number | null;
     jsonrpc: string;
     result?: any;
     error?: {

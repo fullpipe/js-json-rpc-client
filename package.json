@@ -1,6 +1,6 @@
 {
     "name": "js-json-rpc-client",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "description": "",
     "main": "dist/index.js",
     "scripts": {
@@ -21,10 +21,12 @@
         "prettier": "^1.19.1",
         "tslint": "^5.20.1",
         "tslint-config-prettier": "^1.18.0",
-        "tslint-plugin-prettier": "^2.1.0",
-        "typescript": "^3.7.5"
+        "tslint-plugin-prettier": "^2.3.0",
+        "typescript": "^3.9.7"
     },
     "dependencies": {
-        "rxjs": "^6.5.4"
+        "@types/node-fetch": "^2.5.7",
+        "isomorphic-unfetch": "^3.1.0",
+        "rxjs": "^6.6.3"
     }
 }
