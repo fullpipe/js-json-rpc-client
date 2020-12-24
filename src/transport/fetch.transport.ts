@@ -6,7 +6,7 @@ import { from, of, throwError } from 'rxjs';
 import { switchMap, retryWhen, catchError } from 'rxjs/operators';
 import { RequestBody } from './request-body';
 import { RetryConfig } from './generic-retry-strategy';
-import fetch from 'isomorphic-unfetch';
+import fetch from 'cross-fetch';
 
 interface FetchTransportConfig {
     url: string;
