@@ -59,6 +59,10 @@ export class FetchTransport implements TransportInterface {
                         return of(errorResponse(request.id, -32768, 'No results from server'));
                     }
 
+                    if (json.error && typeof json.error == 'string') {
+                        return of(errorResponse(request.id, -32768, json.error));
+                    }
+
                     return of(json);
                 }),
             )
